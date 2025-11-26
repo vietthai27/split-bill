@@ -97,8 +97,8 @@ function BillHistory() {
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        width: 290,
-        height: 700,
+        width: '70%',
+        height: '80%',
         bgcolor: 'background.paper',
         borderRadius: '5px',
         boxShadow: 24,
@@ -275,7 +275,7 @@ function BillHistory() {
             >
                 <Box sx={style}>
                     <Typography id="bill-detail-modal-title" variant="h5" component="h2" gutterBottom align="center">
-                        📜 Chi Tiết Hóa Đơn: ** {billById?.billName || 'N/A'} **
+                        Chi Tiết Hóa Đơn: {billById?.billName || 'N/A'} 
                     </Typography>
                     <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 2 }}>
                         Tạo lúc: {formatDateTime(billById?.createdAt)}
@@ -285,7 +285,7 @@ function BillHistory() {
 
                     {/* --- Chi tiết Thanh toán (REQUEST) --- */}
                     <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
-                        💰 Thanh toán đã nhập:
+                        Thanh toán đã nhập:
                     </Typography>
                     {parsedRequest.length === 0 ? (
                         <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Không có dữ liệu thanh toán.</Typography>
@@ -316,7 +316,7 @@ function BillHistory() {
 
                     {/* --- Kết quả Chia Tiền (RESPONSE) --- */}
                     <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
-                        💵 Kết Quả Chia Tiền:
+                        Kết Quả Chia Tiền:
                     </Typography>
                     {parsedResponse ? (
                         <Box>
@@ -369,7 +369,7 @@ function BillHistory() {
                                 })
                             ) : (
                                 <Typography variant="body2" color="success.main" sx={{ fontStyle: 'italic', ml: 2 }}>
-                                    ✅ Không cần thanh toán bù trừ.
+                                    Không cần thanh toán bù trừ.
                                 </Typography>
                             )}
                         </Box>

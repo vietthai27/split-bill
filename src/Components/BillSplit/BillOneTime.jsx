@@ -147,8 +147,8 @@ export default function BillOneTime() {
                     onChange={(e) => setMemberName(e.target.value)}
                     sx={{ flexGrow: 1 }}
                 />
-                <Button endIcon={<PersonAddIcon />} variant="contained" onClick={handleAddMember}>
-                    Thêm
+                <Button variant="contained" onClick={handleAddMember}>
+                    <PersonAddIcon />
                 </Button>
             </Box>
 
