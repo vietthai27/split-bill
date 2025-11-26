@@ -10,6 +10,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AddCardIcon from '@mui/icons-material/AddCard';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../App/appSlice';
+import { host } from '../../App/ulti';
 
 export default function BillOneTime() {
 
@@ -100,7 +101,7 @@ export default function BillOneTime() {
 
         try {
             dispatch(setLoading(true))
-            const res = await fetch("http://10.15.82.32:8080/api/bill/calculate?bill-name=" + billName, {
+            const res = await fetch(host + "/api/bill/calculate?bill-name=" + billName, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(memberList)

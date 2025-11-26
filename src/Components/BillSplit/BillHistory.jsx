@@ -4,6 +4,7 @@ import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../App/appSlice";
+import { host } from "../../App/ulti";
 
 
 function BillHistory() {
@@ -19,7 +20,7 @@ function BillHistory() {
     const getBillHistory = async () => {
         try {
             dispatch(setLoading(true))
-            const res = await fetch("http://localhost:8080/api/bill/bill-history", {
+            const res = await fetch(host + "/api/bill/bill-history", {
                 method: "GET"
             });
 
@@ -45,7 +46,7 @@ function BillHistory() {
     const getBillById = async (id) => {
         try {
             dispatch(setLoading(true))
-            const res = await fetch("http://localhost:8080/api/bill/bill-by-id/" + id, {
+            const res = await fetch(host + "/api/bill/bill-by-id/" + id, {
                 method: "GET"
             });
 
