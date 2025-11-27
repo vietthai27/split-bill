@@ -5,6 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../App/appSlice";
 import { host } from "../../App/ulti";
+import { toast } from "react-toastify";
 
 
 function BillHistory() {
@@ -26,8 +27,8 @@ function BillHistory() {
 
             if (!res.ok) {
                 const errorText = await res.text();
-                console.error("Server Error:", errorText);
-                alert(`Error get bill history: ${res.status} ${res.statusText}`);
+                toast.error("Lỗi server:", errorText);
+                console.error(`Error get bill history: ${res.status} ${res.statusText}`);
                 return;
             }
 
@@ -36,8 +37,7 @@ function BillHistory() {
 
 
         } catch (error) {
-            console.error("Fetch Error:", error);
-            alert("Could not connect to the backend server.");
+            toast.error("Lỗi kết nối:", error);
         } finally {
             dispatch(setLoading(false))
         }
