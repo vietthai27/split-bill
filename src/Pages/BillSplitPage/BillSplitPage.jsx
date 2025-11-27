@@ -1,4 +1,3 @@
-import BillOneTime from "../../Components/BillSplit/BillOneTime"
 import BillTab from "../../Components/BillSplit/BillTab"
 
 function BillSplitPage() {

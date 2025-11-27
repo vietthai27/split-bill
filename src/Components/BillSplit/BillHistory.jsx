@@ -1,4 +1,4 @@
-import { Box, Collapse, Divider, IconButton, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Avatar, Box, Chip, Collapse, Divider, IconButton, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -174,9 +174,36 @@ function BillHistory() {
         }));
     };
 
+
+    function stringAvatar(name) {
+        return {
+            sx: {
+                bgcolor: stringToColor(name),
+            },
+            children: name?.[0]?.toUpperCase(),
+        };
+    }
+
+    function stringToColor(str) {
+        let hash = 0;
+
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        let color = "#";
+
+        for (let i = 0; i < 3; i++) {
+            const value = (hash >> (i * 8)) & 0xff;
+            color += ("00" + value.toString(16)).slice(-2);
+        }
+
+        return color;
+    }
+
     return (
         <Paper sx={{ p: 2 }}>
-            <Typography variant='h5'>Lịch sử hóa đơn</Typography>
+            <Typography variant='h5' sx={{ mb: 2 }} >Lịch sử hóa đơn</Typography>
             <Divider sx={{ mb: 3 }} />
             <TableContainer
                 component={Paper}
@@ -260,7 +287,7 @@ function BillHistory() {
                                         px: 1
                                     }}
                                 >
-                                    <RequestQuoteIcon sx={{ fontSize: "1rem" }} />
+                                    <RequestQuoteIcon color="primary" sx={{ fontSize: "1.5rem" }} />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -275,7 +302,7 @@ function BillHistory() {
             >
                 <Box sx={style}>
                     <Typography id="bill-detail-modal-title" variant="h5" component="h2" gutterBottom align="center">
-                        Chi Tiết Hóa Đơn: {billById?.billName || 'N/A'} 
+                        Hóa Đơn: {billById?.billName || 'N/A'}
                     </Typography>
                     <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 2 }}>
                         Tạo lúc: {formatDateTime(billById?.createdAt)}
@@ -285,7 +312,7 @@ function BillHistory() {
 
                     {/* --- Chi tiết Thanh toán (REQUEST) --- */}
                     <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
-                        Thanh toán đã nhập:
+                        Thành viên và thanh toán:
                     </Typography>
                     {parsedRequest.length === 0 ? (
                         <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>Không có dữ liệu thanh toán.</Typography>
@@ -293,15 +320,21 @@ function BillHistory() {
                         <Box sx={{ ml: 1 }}>
                             {parsedRequest.map((member, index) => (
                                 <Box key={index} sx={{ mb: 1, p: 1, bgcolor: '#f9f9f9', borderRadius: 1 }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                        👤 {member.name}
-                                    </Typography>
+                                    <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
+                                        <Avatar {...stringAvatar(member.name)} />
+                                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                            {member.name}
+                                        </Typography>
+                                    </Box>
                                     {member.payments.length > 0 ? (
                                         <Box sx={{ ml: 2 }}>
                                             {member.payments.map((pay, pIndex) => (
-                                                <Typography key={pIndex} variant="body2">
-                                                    - {pay.paymentName || 'Khoản chi'} ** {formatCurrency(parseFloat(pay.amount))}
-                                                </Typography>
+                                                <Box>
+                                                    <Typography key={pIndex} variant="body2">
+                                                        - <b>{pay.paymentName || 'Khoản chi'} : </b> ** <u>{formatCurrency(parseFloat(pay.amount))}</u> **
+                                                    </Typography>
+                                                    <Divider sx={{ mb: 1.5 }}/>
+                                                </Box>
                                             ))}
                                         </Box>
                                     ) : (
@@ -316,17 +349,17 @@ function BillHistory() {
 
                     {/* --- Kết quả Chia Tiền (RESPONSE) --- */}
                     <Typography variant="h6" color="primary" sx={{ mb: 1 }}>
-                        Kết Quả Chia Tiền:
+                        Kết quả chia tiền:
                     </Typography>
                     {parsedResponse ? (
                         <Box>
-                            <Typography variant="subtitle1" color="success.main" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                Tổng Hóa Đơn: ** {formatCurrency(parsedResponse.totalAmount)} **
+                            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                                Tổng Hóa Đơn: ** <b>{formatCurrency(parsedResponse.totalAmount)}</b> **
                             </Typography>
 
                             <Divider sx={{ my: 1 }} />
 
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                                 Tiền cần phải trả:
                             </Typography>
 
@@ -335,7 +368,7 @@ function BillHistory() {
                                 Object.entries(groupedSettlements).map(([payerName, data]) => {
                                     const isGroupCollapsed = !!collapsedSettlementState[payerName];
                                     return (
-                                        <Paper key={payerName} sx={{ mb: 1, p: 1, bgcolor: '#ffffffff', borderLeft: '3px solid gray' }}>
+                                        <Paper key={payerName} sx={{ mb: 1, p: 1, bgcolor: '#ffffffff' }}>
                                             <Box
                                                 sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                                                 onClick={() => handleToggleSettlementCollapse(payerName)}
@@ -348,7 +381,7 @@ function BillHistory() {
                                                     <ChevronRightIcon />
                                                 </IconButton>
                                                 <Typography variant="body1">
-                                                    ** {payerName} ** <em>cần trả :</em> <b style={{ color: '#d32f2f' }}>{formatCurrency(data.totalOwed)}</b>
+                                                    <b>{payerName}</b> <em>cần trả :</em> <Chip color="error" label={<b>{formatCurrency(data.totalOwed)}</b>}></Chip>
                                                 </Typography>
                                             </Box>
 
@@ -357,7 +390,7 @@ function BillHistory() {
                                                     {data.transactions.map((tx, index) => (
                                                         <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                                                             <Typography variant="body2" sx={{ fontWeight: 'medium' }}>trả</Typography>
-                                                            <Typography variant="body1" color="error" sx={{ fontWeight: 'bold' }}>{formatCurrency(tx.amount)}</Typography>
+                                                            <Typography variant="body1" color="error">{formatCurrency(tx.amount)}</Typography>
                                                             <Typography variant="body2">cho</Typography>
                                                             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>{tx.recipientName}</Typography>
                                                         </Box>

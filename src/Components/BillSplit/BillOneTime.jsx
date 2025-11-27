@@ -1,4 +1,4 @@
-import { Button, Paper, Typography, Divider, IconButton, Collapse } from '@mui/material';
+import { Button, Paper, Typography, Divider, IconButton, Collapse, InputAdornment } from '@mui/material';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
@@ -11,6 +11,9 @@ import AddCardIcon from '@mui/icons-material/AddCard';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../App/appSlice';
 import { host } from '../../App/ulti';
+import { toast } from 'react-toastify';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 export default function BillOneTime() {
 
@@ -23,10 +26,13 @@ export default function BillOneTime() {
 
     const formatCurrency = (amount) => {
         if (typeof amount !== 'number' || isNaN(amount)) {
-            return 'NaN đ';
+            return '0 đ';
         }
         return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
             currency: 'VND',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(amount);
     };
 
@@ -55,7 +61,10 @@ export default function BillOneTime() {
     };
 
     const handleAddMember = () => {
-        if (!memberName.trim()) return;
+        if (!memberName.trim()) {
+            toast.warn("Chưa nhập thành viên")
+            return
+        };
 
         setMemberList([
             ...memberList,
@@ -109,23 +118,23 @@ export default function BillOneTime() {
 
             if (!res.ok) {
                 const errorText = await res.text();
-                console.error("Server Error:", errorText);
-                alert(`Error calculating bill: ${res.status} ${res.statusText}`);
+                toast.error("Lỗi server:", errorText);
+                console.error(`Error calculating bill: ${res.status} ${res.statusText}`);
                 return;
             }
 
-            const data = await res.json();
-            setSummary(data);
+            // const data = await res.json();
+            // setSummary(data);
 
         } catch (error) {
-            console.error("Fetch Error:", error);
-            alert("Could not connect to the backend server.");
+            toast.error("Lỗi kết nối:", error);
         } finally {
             dispatch(setLoading(false))
+            toast.success("Chia tiền thành công")
         }
     };
 
-    
+
 
     return (
         <Paper sx={{ p: 2 }}>
@@ -135,6 +144,15 @@ export default function BillOneTime() {
                 value={billName}
                 onChange={(e) => setBillName(e.target.value)}
                 sx={{ flexGrow: 1, margin: 2 }}
+                slotProps={{
+                    input: {
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <MonetizationOnIcon />
+                            </InputAdornment>
+                        )
+                    }
+                }}
             />
 
             <Divider sx={{ mb: 3 }} />
@@ -164,11 +182,10 @@ export default function BillOneTime() {
                         mb: 2,
                         cursor: 'pointer'
                     }}
-                    onClick={() => { setMemberListCollapsed(!memberListCollapsed) }}
+                    onClick={() => setMemberListCollapsed(!memberListCollapsed)}
                 >
                     <IconButton
                         size="small"
-                        // Logic sửa lỗi: rotate(0deg) khi đóng (memberListCollapsed=true), rotate(90deg) khi mở (memberListCollapsed=false)
                         sx={{
                             transform: memberListCollapsed ? 'rotate(0deg)' : 'rotate(90deg)',
                             transition: 'transform 0.3s',
@@ -177,8 +194,11 @@ export default function BillOneTime() {
                     >
                         <ChevronRightIcon />
                     </IconButton>
-                    <Typography variant='h5'>Danh sách thành viên</Typography>
 
+                    <Box display="flex" alignItems="center" gap={2}>
+                        <GroupsIcon />   {/* ← icon next to text */}
+                        <Typography variant="h5">Danh sách thành viên</Typography>
+                    </Box>
                 </Box>
 
                 {memberList.length === 0 ? (
@@ -189,12 +209,31 @@ export default function BillOneTime() {
                             return (
                                 <Paper key={memberIndex} sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0' }}>
                                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2, borderBottom: '1px dotted #ccc', pb: 1 }}>
-                                        <AccountCircleIcon color="primary" />
-                                        <Typography variant="h6" sx={{ flexGrow: 1 }}>{member.name}</Typography>
+                                        <AccountCircleIcon sx={{
+                                            width: 32,
+                                            height: 32,
+                                            minWidth: 0,
+                                            padding: 1,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }} color="primary" />
+                                        <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'left', fontWeight: 'bold' }}>{member.name}</Typography>
                                         <Button
                                             variant="contained"
                                             size="small"
                                             onClick={() => handleAddPayment(memberIndex)}
+                                            sx={{
+                                                width: 32,
+                                                height: 32,
+                                                minWidth: 0,
+                                                padding: 1,
+                                                borderRadius: '50%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
                                         >
                                             <AddCardIcon fontSize="small" />
                                         </Button>
@@ -204,6 +243,16 @@ export default function BillOneTime() {
                                             color="error"
                                             size="small"
                                             onClick={() => removeMember(memberIndex)}
+                                            sx={{
+                                                width: 32,
+                                                height: 32,
+                                                minWidth: 0,
+                                                padding: 1,
+                                                borderRadius: '50%',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
                                         >
                                             <DeleteIcon fontSize="small" />
                                         </Button>
@@ -217,12 +266,22 @@ export default function BillOneTime() {
                                         )}
 
                                         {member.payments.map((pay, payIndex) => (
-                                            <Box key={payIndex} sx={{ display: 'flex', gap: 2, mb: 1, ml: 4, alignItems: 'center' }}>
+                                            <Box key={payIndex} sx={{
+                                                display: 'flex', gap: 2, mb: 1, ml: 1, alignItems: 'center'                                            }}>
                                                 <TextField
                                                     label="Khoản"
                                                     variant="standard"
                                                     size="small"
                                                     value={pay.paymentName}
+                                                    slotProps={{
+                                                        input: {
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">
+                                                                    <MonetizationOnIcon />
+                                                                </InputAdornment>
+                                                            )
+                                                        }
+                                                    }}
                                                     onChange={(e) => handleChangePayment(memberIndex, payIndex, "paymentName", e.target.value)}
                                                 />
 
@@ -232,15 +291,24 @@ export default function BillOneTime() {
                                                     size="small"
                                                     type="number"
                                                     value={pay.amount}
+                                                    slotProps={{
+                                                        input: {
+                                                            endAdornment: (
+                                                                <InputAdornment position="end">
+                                                                    <MonetizationOnIcon />
+                                                                </InputAdornment>
+                                                            )
+                                                        }
+                                                    }}
                                                     onChange={(e) => handleChangePayment(memberIndex, payIndex, "amount", e.target.value)}
-                                                    sx={{ maxWidth: 120 }}
+                                                    sx={{ maxWidth: 150 }}
                                                 />
 
                                                 <Button
                                                     variant="text"
                                                     color="error"
                                                     onClick={() => handleRemovePayment(memberIndex, payIndex)}
-                                                    sx={{ minWidth: '30px' }}
+                                                    sx={{ minWidth: 30, border: '1px solid' }}
                                                 >
                                                     <DeleteIcon fontSize="small" />
                                                 </Button>
@@ -252,7 +320,7 @@ export default function BillOneTime() {
                         })}
                         {memberList.length > 0 && (
                             <Box sx={{ textAlign: "center", mt: 3, mb: 3 }}>
-                                <Button endIcon={<PaidIcon/>} sx={{ color: 'white', margin: 2, padding: 1 }} className="button-85" onClick={getData}>
+                                <Button endIcon={<PaidIcon />} variant='contained' onClick={getData}>
                                     Chia tiền
                                 </Button>
                             </Box>
@@ -264,7 +332,7 @@ export default function BillOneTime() {
             </Box>
 
             {summary && (
-                <Paper sx={{ p: 3, mt: 4, bgcolor: '#f5f5f5' }}>
+                <Paper sx={{ p: 3, mt: 0, bgcolor: '#f5f5f5' }}>
                     <Typography variant="h5" component="h2" gutterBottom>
                         Kết quả
                     </Typography>
@@ -272,14 +340,10 @@ export default function BillOneTime() {
                     <Divider sx={{ mb: 2 }} />
 
                     <Typography variant="h6" color="primary">
-                        Tổng thanh toán: {formatCurrency(summary.totalAmount)} đ
+                        Tổng chi: ** {formatCurrency(summary.totalAmount)} **
                     </Typography>
 
                     <Divider sx={{ my: 2 }} />
-
-                    <Typography variant="h6" gutterBottom>
-                        Trả tiền:
-                    </Typography>
 
                     {summary.settlements && summary.settlements.length > 0 ? (
                         <Box>
@@ -303,7 +367,7 @@ export default function BillOneTime() {
                                                 <ChevronRightIcon />
                                             </IconButton>
                                             <Typography variant="body1">
-                                                <b>{payerName}</b> <em>còn nợ:</em> {formatCurrency(data.totalOwed)} đ
+                                                <b>{payerName}</b> <em>cần trả :</em> <b style={{ color: '#d32f2f' }}>{formatCurrency(data.totalOwed)}</b>
                                             </Typography>
                                         </Box>
 

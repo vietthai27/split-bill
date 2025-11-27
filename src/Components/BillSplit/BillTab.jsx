@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import BillForGroup from './BillForGroup';
 import BillOneTime from './BillOneTime';
 import BillHistory from './BillHistory';
+import HistoryIcon from '@mui/icons-material/History';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 export function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -47,16 +48,25 @@ export default function BillTab() {
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="Tính tiền" {...a11yProps(0)} />
-                    <Tab label="Lịch sử" {...a11yProps(1)} />
+                    <Tab label={
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <span>Tính tiền</span>
+                            <AttachMoneyIcon fontSize="small" />
+                        </Box>
+                    } {...a11yProps(0)} />
+                    <Tab label={
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <span>Lịch sử</span>
+                            <HistoryIcon fontSize="small" />
+                        </Box>
+                    } {...a11yProps(1)} />
                 </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
                 <BillOneTime />
             </CustomTabPanel>
             <CustomTabPanel value={value} index={1}>
-                {/* <BillForGroup /> */}
-                <BillHistory/>
+                <BillHistory />
             </CustomTabPanel>
         </Box>
     );

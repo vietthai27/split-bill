@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import './App.css';
 import BillSplitPage from './Pages/BillSplitPage/BillSplitPage';
 import Loading from './Components/Loading/Loading';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
   return (
     <div className="App">
       <BillSplitPage />
+      <ToastContainer />
       {loading ? (<Loading />) : (null)}
     </div>
   );
